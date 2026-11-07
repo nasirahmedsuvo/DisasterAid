@@ -1,0 +1,36 @@
+
+<resources>
+
+    <style name="Base.Theme.DisasterAid"
+        parent="Theme.MaterialComponents.DayNight.NoActionBar">
+
+        <item name="colorPrimary">@color/primary</item>
+
+        <item name="colorPrimaryVariant">@color/primary</item>
+
+        <item name="colorSecondary">@color/secondary</item>
+
+        <item name="colorOnPrimary">@color/white</item>
+
+        <item name="colorOnSecondary">@color/white</item>
+
+        <item name="android:statusBarColor">@color/primary</item>
+
+        <item name="android:navigationBarColor">@color/white</item>
+
+        <item name="android:windowLightNavigationBar">true</item>
+
+        <item name="android:windowLightStatusBar">false</item>
+
+        <item name="android:windowBackground">@color/background</item>
+
+        <item name="android:textColorPrimary">#243247</item>
+        <item name="android:textColorSecondary">#7B8798</item>
+        <item name="colorOnSurface">#243247</item>
+        <item name="colorOnBackground">#243247</item>
+    </style>
+
+    <style name="Theme.DisasterAid"
+        parent="Base.Theme.DisasterAid" />
+
+</resources>

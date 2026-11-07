@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="24dp"
+    android:background="#F4F7FB">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="DisasterAid Photo"
+        android:textColor="#173B64"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"/>
+
+    <ImageView
+        android:id="@+id/ivSelectedPhoto"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:background="#FFFFFF"
+        android:scaleType="centerCrop"
+        android:contentDescription="Selected emergency photo"
+        android:src="@android:drawable/ic_menu_camera"/>
+
+    <Button
+        android:id="@+id/btnOpenCamera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Take Photo"
+        android:backgroundTint="#16A085"
+        android:textColor="#FFFFFF"/>
+
+    <Button
+        android:id="@+id/btnOpenGallery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Choose from Gallery"
+        android:backgroundTint="#173B64"
+        android:textColor="#FFFFFF"/>
+
+</LinearLayout>
