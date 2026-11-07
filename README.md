@@ -31,6 +31,16 @@ affected by emergencies with volunteers and available resources.
 - Nearby hospital search
 - User settings
 
+## Building the APK
+To generate the debug APK for testing and deployment:
+1. Open the project in Android Studio or terminal.
+2. Run the Gradle build command:
+   ```bash
+   ./gradlew assembleDebug
+   ```
+3. The generated APK will be located at:
+   `app/build/outputs/apk/debug/app-debug.apk`
+
 ## Firebase Setup
 This project uses Firebase Authentication and Realtime Database.
 
