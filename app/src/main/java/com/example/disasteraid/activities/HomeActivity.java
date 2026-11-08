@@ -19,6 +19,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.disasteraid.R;
 import com.example.disasteraid.helpers.FirebaseHelper;
 import com.example.disasteraid.helpers.PreferenceManager;
+import com.example.disasteraid.models.AidRequest;
+import com.example.disasteraid.models.Resource;
+import com.example.disasteraid.models.Volunteer;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -82,6 +85,7 @@ public class HomeActivity extends AppCompatActivity
 
         loadUserName();
         loadStatistics();
+        seedInitialDataIfNeeded();
 
         setDashboardListeners();
         setBottomNavigationListeners();
@@ -291,6 +295,58 @@ public class HomeActivity extends AppCompatActivity
 
         database.child("resources")
                 .addValueEventListener(resourceListener);
+    }
+
+    // Seed initial demo data for free if lists are empty
+    private void seedInitialDataIfNeeded() {
+        String uid = FirebaseHelper.getCurrentUserId();
+        if (uid == null) return;
+
+        database.child("aidRequests").get().addOnSuccessListener(snapshot -> {
+            if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                long now = System.currentTimeMillis();
+                String id1 = database.child("aidRequests").push().getKey();
+                if (id1 != null) {
+                    AidRequest req1 = new AidRequest(id1, uid, "Emergency Food Pack Needed", "Food", "Family of 5 stranded without food supplies.", "Downtown Area", "5 Boxes", "Pending", now, now);
+                    database.child("aidRequests").child(id1).setValue(req1);
+                }
+                String id2 = database.child("aidRequests").push().getKey();
+                if (id2 != null) {
+                    AidRequest req2 = new AidRequest(id2, uid, "Clean Drinking Water", "Water", "Immediate need for bottled water after pipeline failure.", "Sector 4", "20 Liters", "Pending", now, now);
+                    database.child("aidRequests").child(id2).setValue(req2);
+                }
+            }
+        });
+
+        database.child("volunteers").get().addOnSuccessListener(snapshot -> {
+            if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                String id1 = database.child("volunteers").push().getKey();
+                if (id1 != null) {
+                    Volunteer vol1 = new Volunteer(id1, uid, "Alex Morgan", "+15550192", "First Aid, Medical Assistance", "Available anytime", "Central City");
+                    database.child("volunteers").child(id1).setValue(vol1);
+                }
+                String id2 = database.child("volunteers").push().getKey();
+                if (id2 != null) {
+                    Volunteer vol2 = new Volunteer(id2, uid, "Sarah Connor", "+15550183", "Search and Rescue, Driving", "Morning", "North District");
+                    database.child("volunteers").child(id2).setValue(vol2);
+                }
+            }
+        });
+
+        database.child("resources").get().addOnSuccessListener(snapshot -> {
+            if (!snapshot.exists() || snapshot.getChildrenCount() == 0) {
+                String id1 = database.child("resources").push().getKey();
+                if (id1 != null) {
+                    Resource res1 = new Resource(id1, uid, "Emergency Medical Kit", "Medicine", "15 Kits", "City Community Center", System.currentTimeMillis());
+                    database.child("resources").child(id1).setValue(res1);
+                }
+                String id2 = database.child("resources").push().getKey();
+                if (id2 != null) {
+                    Resource res2 = new Resource(id2, uid, "Bottled Mineral Water", "Water", "100 Bottles", "Warehouse B", System.currentTimeMillis());
+                    database.child("resources").child(id2).setValue(res2);
+                }
+            }
+        });
     }
 
     // Count Firebase records

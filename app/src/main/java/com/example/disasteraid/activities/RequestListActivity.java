@@ -3,12 +3,9 @@ package com.example.disasteraid.activities;
 
 import android.os.Bundle;
 import android.text.InputType;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -48,20 +45,9 @@ public class RequestListActivity extends AppCompatActivity {
 
     private String currentUserId;
 
-    // App colors
-    private static final int PRIMARY = Color.rgb(23, 59, 100);
-    private static final int SECONDARY = Color.rgb(22, 160, 133);
-    private static final int TEXT_DARK = Color.rgb(36, 50, 71);
-    private static final int TEXT_HINT = Color.rgb(123, 135, 152);
-    private static final int WHITE = Color.WHITE;
-
     private final String[] categories = {
-            "Food",
-            "Water",
-            "Medicine",
-            "Shelter",
-            "Clothing",
-            "Other"
+            "Food", "Water", "Medicine",
+            "Shelter", "Clothing", "Other"
     };
 
     @Override
@@ -72,8 +58,7 @@ public class RequestListActivity extends AppCompatActivity {
         currentUserId = FirebaseHelper.getCurrentUserId();
 
         if (currentUserId == null) {
-            Toast.makeText(this,
-                    "Please login first",
+            Toast.makeText(this, "Please login first",
                     Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -106,8 +91,7 @@ public class RequestListActivity extends AppCompatActivity {
         );
 
         recyclerRequests.setLayoutManager(
-                new LinearLayoutManager(this)
-        );
+                new LinearLayoutManager(this));
 
         recyclerRequests.setAdapter(adapter);
 
@@ -117,13 +101,14 @@ public class RequestListActivity extends AppCompatActivity {
         loadRequests();
     }
 
-    // READ: Load requests from Firebase
+    // Load requests from Firebase
     private void loadRequests() {
 
         requestsListener = new ValueEventListener() {
 
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onDataChange(
+                    @NonNull DataSnapshot snapshot) {
 
                 requestList.clear();
 
@@ -142,17 +127,21 @@ public class RequestListActivity extends AppCompatActivity {
 
                 if (requestList.isEmpty()) {
                     tvEmpty.setVisibility(View.VISIBLE);
+                    recyclerRequests.setVisibility(View.GONE);
                 } else {
                     tvEmpty.setVisibility(View.GONE);
+                    recyclerRequests.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onCancelled(
+                    @NonNull DatabaseError error) {
 
                 Toast.makeText(
                         RequestListActivity.this,
-                        "Failed to load requests: " + error.getMessage(),
+                        "Failed to load requests: "
+                                + error.getMessage(),
                         Toast.LENGTH_LONG
                 ).show();
             }
@@ -161,101 +150,50 @@ public class RequestListActivity extends AppCompatActivity {
         requestsRef.addValueEventListener(requestsListener);
     }
 
-    // CREATE / UPDATE: Show request form
+    // Create or edit request dialog
     private void showRequestDialog(AidRequest existingRequest) {
 
         boolean isEditing = existingRequest != null;
 
-        LinearLayout form = new LinearLayout(this);
-        form.setOrientation(LinearLayout.VERTICAL);
-        form.setPadding(40, 20, 40, 10);
-        form.setBackgroundColor(WHITE);
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(40, 20, 40, 10);
 
-        EditText etTitle = createInput(
-                "Request Title",
-                InputType.TYPE_CLASS_TEXT
-        );
+        EditText etTitle = new EditText(this);
+        etTitle.setHint("Request Title");
+        layout.addView(etTitle);
 
         Spinner spCategory = new Spinner(this);
 
         ArrayAdapter<String> categoryAdapter =
-                new ArrayAdapter<String>(
+                new ArrayAdapter<>(
                         this,
                         android.R.layout.simple_spinner_item,
                         categories
-                ) {
-
-                    @NonNull
-                    @Override
-                    public View getView(
-                            int position,
-                            View convertView,
-                            @NonNull android.view.ViewGroup parent) {
-
-                        TextView text = (TextView) super.getView(
-                                position, convertView, parent
-                        );
-
-                        text.setTextColor(TEXT_DARK);
-                        text.setTextSize(15);
-                        text.setPadding(8, 12, 8, 12);
-
-                        return text;
-                    }
-
-                    @Override
-                    public View getDropDownView(
-                            int position,
-                            View convertView,
-                            @NonNull android.view.ViewGroup parent) {
-
-                        TextView text = (TextView) super.getDropDownView(
-                                position, convertView, parent
-                        );
-
-                        text.setTextColor(TEXT_DARK);
-                        text.setBackgroundColor(WHITE);
-                        text.setTextSize(15);
-                        text.setPadding(20, 16, 20, 16);
-
-                        return text;
-                    }
-                };
+                );
 
         categoryAdapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item
-        );
+                android.R.layout.simple_spinner_dropdown_item);
 
         spCategory.setAdapter(categoryAdapter);
+        layout.addView(spCategory);
 
-        spCategory.setBackgroundTintList(
-                ColorStateList.valueOf(SECONDARY)
-        );
-
-        EditText etDescription = createInput(
-                "Describe your emergency",
-                InputType.TYPE_CLASS_TEXT
-                        | InputType.TYPE_TEXT_FLAG_MULTI_LINE
-        );
-
+        EditText etDescription = new EditText(this);
+        etDescription.setHint("Describe your emergency");
         etDescription.setMinLines(2);
+        etDescription.setGravity(Gravity.TOP);
+        layout.addView(etDescription);
 
-        EditText etLocation = createInput(
-                "Location",
-                InputType.TYPE_CLASS_TEXT
-        );
+        EditText etLocation = new EditText(this);
+        etLocation.setHint("Location");
+        layout.addView(etLocation);
 
-        EditText etQuantity = createInput(
-                "Quantity (example: 10 people or 5 boxes)",
-                InputType.TYPE_CLASS_TEXT
-        );
+        EditText etQuantity = new EditText(this);
+        etQuantity.setHint("Quantity");
+        etQuantity.setInputType(InputType.TYPE_CLASS_TEXT);
+        layout.addView(etQuantity);
 
-        form.addView(etTitle);
-        form.addView(spCategory);
-        form.addView(etDescription);
-        form.addView(etLocation);
-        form.addView(etQuantity);
-
+        // Fill existing data when editing
         if (isEditing) {
 
             etTitle.setText(existingRequest.getTitle());
@@ -263,164 +201,87 @@ public class RequestListActivity extends AppCompatActivity {
             etLocation.setText(existingRequest.getLocation());
             etQuantity.setText(existingRequest.getQuantity());
 
-            int selectedCategory = categoryAdapter.getPosition(
-                    existingRequest.getCategory()
-            );
+            int position = 0;
 
-            if (selectedCategory >= 0) {
-                spCategory.setSelection(selectedCategory);
+            for (int i = 0; i < categories.length; i++) {
+                if (categories[i].equals(
+                        existingRequest.getCategory())) {
+                    position = i;
+                    break;
+                }
             }
+
+            spCategory.setSelection(position);
         }
 
         AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(isEditing
-                        ? "Edit Emergency Request"
-                        : "Create Emergency Request")
-                .setView(form)
+                .setTitle(isEditing ? "Edit Request" : "Create Request")
+                .setView(layout)
+                .setPositiveButton(isEditing ? "Update" : "Save", null)
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton(
-                        isEditing ? "Update" : "Create",
-                        null
-                )
                 .create();
 
         dialog.setOnShowListener(d -> {
 
-            // Set dialog background to white
-            if (dialog.getWindow() != null) {
-                dialog.getWindow().setBackgroundDrawable(
-                        new ColorDrawable(WHITE)
-                );
-            }
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                    .setOnClickListener(v -> {
 
-            // Set dialog title color
-            TextView titleView = dialog.findViewById(
-                    androidx.appcompat.R.id.alertTitle
-            );
+                        String title = etTitle.getText()
+                                .toString().trim();
 
-            if (titleView != null) {
-                titleView.setTextColor(PRIMARY);
-                titleView.setTextSize(20);
-            }
+                        String category = spCategory
+                                .getSelectedItem().toString();
 
-            // Style Cancel button
-            Button cancelButton = dialog.getButton(
-                    AlertDialog.BUTTON_NEGATIVE
-            );
+                        String description = etDescription.getText()
+                                .toString().trim();
 
-            if (cancelButton != null) {
-                cancelButton.setTextColor(SECONDARY);
-            }
+                        String location = etLocation.getText()
+                                .toString().trim();
 
-            // Style Create / Update button
-            Button saveButton = dialog.getButton(
-                    AlertDialog.BUTTON_POSITIVE
-            );
+                        String quantity = etQuantity.getText()
+                                .toString().trim();
 
-            if (saveButton != null) {
-                saveButton.setTextColor(SECONDARY);
+                        if (title.isEmpty()
+                                || description.isEmpty()
+                                || location.isEmpty()
+                                || quantity.isEmpty()) {
 
-                saveButton.setOnClickListener(v -> {
+                            Toast.makeText(
+                                    this,
+                                    "Please fill in all fields",
+                                    Toast.LENGTH_SHORT
+                            ).show();
 
-                    String title = etTitle.getText()
-                            .toString().trim();
+                            return;
+                        }
 
-                    String description = etDescription.getText()
-                            .toString().trim();
+                        if (isEditing) {
+                            updateRequest(
+                                    existingRequest,
+                                    title,
+                                    category,
+                                    description,
+                                    location,
+                                    quantity
+                            );
+                        } else {
+                            createRequest(
+                                    title,
+                                    category,
+                                    description,
+                                    location,
+                                    quantity
+                            );
+                        }
 
-                    String location = etLocation.getText()
-                            .toString().trim();
-
-                    String quantity = etQuantity.getText()
-                            .toString().trim();
-
-                    String category =
-                            spCategory.getSelectedItem().toString();
-
-                    // Input validation
-                    if (title.isEmpty()) {
-                        etTitle.setError("Enter a request title");
-                        return;
-                    }
-
-                    if (description.isEmpty()) {
-                        etDescription.setError("Enter a description");
-                        return;
-                    }
-
-                    if (location.isEmpty()) {
-                        etLocation.setError("Enter your location");
-                        return;
-                    }
-
-                    if (quantity.isEmpty()) {
-                        etQuantity.setError(
-                                "Enter the required quantity"
-                        );
-                        return;
-                    }
-
-                    if (isEditing) {
-
-                        updateRequest(
-                                existingRequest,
-                                title,
-                                category,
-                                description,
-                                location,
-                                quantity
-                        );
-
-                    } else {
-
-                        createRequest(
-                                title,
-                                category,
-                                description,
-                                location,
-                                quantity
-                        );
-                    }
-
-                    dialog.dismiss();
-                });
-            }
+                        dialog.dismiss();
+                    });
         });
 
         dialog.show();
     }
 
-    // Reusable input field with corrected colors
-    private EditText createInput(String hint, int inputType) {
-
-        EditText editText = new EditText(this);
-
-        editText.setHint(hint);
-        editText.setInputType(inputType);
-
-        editText.setTextColor(TEXT_DARK);
-        editText.setHintTextColor(TEXT_HINT);
-
-        editText.setTextSize(15);
-
-        editText.setBackgroundTintList(
-                ColorStateList.valueOf(SECONDARY)
-        );
-
-        LinearLayout.LayoutParams params =
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-
-        params.bottomMargin = 12;
-
-        editText.setLayoutParams(params);
-
-        return editText;
-    }
-
-    // CREATE: Save a new request
+    // Create a new request
     private void createRequest(
             String title,
             String category,
@@ -431,8 +292,7 @@ public class RequestListActivity extends AppCompatActivity {
         String requestId = requestsRef.push().getKey();
 
         if (requestId == null) {
-            Toast.makeText(this,
-                    "Could not create request ID",
+            Toast.makeText(this, "Unable to create request",
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -457,18 +317,26 @@ public class RequestListActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
 
                     if (task.isSuccessful()) {
-                        Toast.makeText(this,
+                        Toast.makeText(
+                                this,
                                 "Request created successfully!",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     } else {
-                        Toast.makeText(this,
-                                "Failed to create request",
-                                Toast.LENGTH_LONG).show();
+                        String error = task.getException() != null
+                                ? task.getException().getMessage()
+                                : "Unknown error";
+
+                        Toast.makeText(
+                                this,
+                                "Failed to create request: " + error,
+                                Toast.LENGTH_LONG
+                        ).show();
                     }
                 });
     }
 
-    // UPDATE: Update an existing request
+    // Update an existing request
     private void updateRequest(
             AidRequest oldRequest,
             String title,
@@ -478,8 +346,7 @@ public class RequestListActivity extends AppCompatActivity {
             String quantity) {
 
         if (!currentUserId.equals(oldRequest.getUserId())) {
-            Toast.makeText(this,
-                    "You cannot edit another user's request",
+            Toast.makeText(this, "You cannot edit this request",
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -496,63 +363,69 @@ public class RequestListActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
 
                     if (task.isSuccessful()) {
-                        Toast.makeText(this,
+                        Toast.makeText(
+                                this,
                                 "Request updated successfully!",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     } else {
-                        Toast.makeText(this,
+                        Toast.makeText(
+                                this,
                                 "Failed to update request",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     }
                 });
     }
 
-    // DELETE: Ask for confirmation
+    // Confirm before deleting
     private void confirmDelete(AidRequest request) {
-
-        if (!currentUserId.equals(request.getUserId())) {
-            Toast.makeText(this,
-                    "You cannot delete another user's request",
-                    Toast.LENGTH_SHORT).show();
-            return;
-        }
 
         new AlertDialog.Builder(this)
                 .setTitle("Delete Request")
                 .setMessage(
                         "Are you sure you want to delete this request?"
                 )
-                .setNegativeButton("Cancel", null)
                 .setPositiveButton("Delete", (dialog, which) ->
                         deleteRequest(request))
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
-    // DELETE: Remove request from Firebase
+    // Delete request from Firebase
     private void deleteRequest(AidRequest request) {
+
+        if (!currentUserId.equals(request.getUserId())) {
+            Toast.makeText(this, "You cannot delete this request",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         requestsRef.child(request.getRequestId())
                 .removeValue()
                 .addOnCompleteListener(task -> {
 
                     if (task.isSuccessful()) {
-                        Toast.makeText(this,
+                        Toast.makeText(
+                                this,
                                 "Request deleted successfully!",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     } else {
-                        Toast.makeText(this,
+                        Toast.makeText(
+                                this,
                                 "Failed to delete request",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     }
                 });
     }
 
     @Override
     protected void onDestroy() {
-
         super.onDestroy();
 
-        if (requestsListener != null && requestsRef != null) {
+        if (requestsRef != null && requestsListener != null) {
             requestsRef.removeEventListener(requestsListener);
         }
     }
